@@ -2,6 +2,9 @@
 
 import numpy as np
 import torch
+from torch.nn.utils.rnn import pad_sequence
+from torchtext.data import get_tokenizer
+from torchtext.vocab import build_vocab_from_iterator
 
 # 1.
 # N-PairLoss.py的部分代码
@@ -66,3 +69,95 @@ import torch
 # print(values, indices)
 # ----------------------------------------------------------------------------------------------------------------------
 
+# 5.
+# 34Transformer.py的unsqueeze(): unsqueeze()函数起升维的作用,参数表示在哪个地方加一个维度
+# input = torch.arange(0, 6)
+# print(input)  # tensor([0, 1, 2, 3, 4, 5])
+# print(input.shape)  # torch.Size([6])
+# print(input.unsqueeze(0))  # tensor([[0, 1, 2, 3, 4, 5]])
+# print(input.unsqueeze(0).shape)  # torch.Size([1, 6])
+# print(input.unsqueeze(1))
+# # tensor([[0],
+# #         [1],
+# #         [2],
+# #         [3],
+# #         [4],
+# #         [5]])
+# print(input.unsqueeze(1).shape)  # torch.Size([6, 1])
+# ----------------------------------------------------------------------------------------------------------------------
+
+# 6.
+# 35Transformer.py的torchtext模块
+# 6.1 get_tokenizer()
+# 创建一个分词器，将语料喂给相应的分词器，分词器支持’basic_english’，‘spacy’，‘moses’，‘toktok’，‘revtok’，'subword’等规则
+# message = "I love China."
+# tokenizer = get_tokenizer('basic_english')
+# print(tokenizer(message))  # ['i', 'love', 'china', '.']
+# ----------------------------------------------------------------------------------------------------------------------
+# 6.2 build_vocab_from_iterator()
+# 从一个可迭代对象中统计token的频次，并返回一个vocab(词汇字典)
+# vocab = build_vocab_from_iterator(tokenizer(message), specials=['<unk>', '<pad>', '<bos>', '<eos>'])
+# print(vocab)  # Vocab()
+# vocab.set_default_index(vocab['<unk>'])  # 设置默认索引为 <unk>
+# sentences = [["The", "cat", "sat", "on", "the", "mat"], ["The", "dog", "played", "with", "cat", "ball"], ['cat', 'like',
+#              'dog', 'kidding']]
+# # min_feq设置最小频率为1，即只要出现过的都不会在这里被筛掉
+# # max_tokens设置为10，表示词典的长度为10，但是因为有了specials，所以真正的词典中有效token为9个
+# vocab = build_vocab_from_iterator(sentences, min_freq=1, max_tokens=10, specials=['<unk>'])
+# # 设置默认索引，若是索引的单词不在词典内，则返回0，此例中0与<unk>对应
+# vocab.set_default_index(0)
+# # 查看词典(字典形式)
+# print(vocab.get_stoi())
+# # {'dog': 3,'<unk>': 0, 'kidding': 5, 'cat': 1, 'ball': 4, 'The': 2, 'like': 6, 'mat': 7, 'on': 8, 'played': 9}
+# # 查看字典(列表形式)
+# print(vocab.get_itos())
+# # ['<unk>', 'cat', 'The', 'dog', 'ball', 'kidding', 'like', 'mat', 'on', 'played']
+# ----------------------------------------------------------------------------------------------------------------------
+# 6.3 将句子转换为索引序列
+# vocab = build_vocab_from_iterator(tokenizer(message), specials=['<unk>', '<pad>', '<bos>', '<eos>'])
+# vocab.set_default_index(vocab['<unk>'])  # 设置默认索引为 <unk>
+# def process_sentence(sentence, tokenizer, vocab):
+#     sentence_list = tokenizer(sentence)
+#     tokens = ['<bos>'] + sentence_list + ['<eos>']
+#     indices = [vocab[token] for token in tokens]
+#     return indices
+# print(process_sentence(message, tokenizer, vocab))  # [2, 4, 0, 0, 5, 3] ?????
+# ----------------------------------------------------------------------------------------------------------------------
+
+# 7.
+# 35Transformer.py的pad_sequence()
+# 填充句子到相同长度
+# a = torch.ones(25, 300)
+# b = torch.ones(22, 300)
+# c = torch.ones(15, 300)
+# print(pad_sequence([a, b, c]).size())  # torch.Size([25, 3, 300])
+# ----------------------------------------------------------------------------------------------------------------------
+
+# 8.
+# 36ViT.py的transpose()
+# 转置函数, 交换维度dim0和dim1(交换行列索引值)
+# num = torch.tensor([[1, 2, 3], [4, 5, 6]])
+# print(num.transpose(-1, -2))  # 等价于print(num.transpose(0, 1))、print(num.transpose(-2, -1))
+# 输出：tensor([[1, 4],
+#         [2, 5],
+#         [3, 6]])
+# ----------------------------------------------------------------------------------------------------------------------
+
+# 9.
+# RelativePositionEmbedding.py的.contiguous()
+# https://zhuanlan.zhihu.com/p/64551412
+# ----------------------------------------------------------------------------------------------------------------------
+
+# 10.
+# RelativePositionEmbedding.py的.permute()
+# 转置函数
+# coords_h = torch.arange(2)
+# coords_w = torch.arange(2)
+# mesh = torch.meshgrid([coords_h, coords_w])  # 2*2*2
+# mesh = torch.stack(mesh)  # 2*4*2
+# print(mesh.permute(0, 2, 1))  # 2*2*4
+# ----------------------------------------------------------------------------------------------------------------------
+
+# 11.
+#
+# ----------------------------------------------------------------------------------------------------------------------
