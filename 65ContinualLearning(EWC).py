@@ -84,6 +84,7 @@ accuracies['mnist_initial'] = get_accuracy(model, test_loader)
 
 # EWC
 def estimate_ewc_params(model, train_ds, batch_size=100, num_batch=300, estimate_type='true'):
+    # 记录模型参数在完成第一个任务训练后的值
     estimated_mean = {}
 
     for param_name, param in model.named_parameters():
@@ -134,6 +135,19 @@ def ewc_loss(model, weight, estimated_fishers, estimated_means):
 estimated_mean, estimated_fisher = estimate_ewc_params(model, mnist_train)
 
 # 在B上训练
+# 不使用EWC
+for epoch in range(EPOCHS):
+    for input, target in tqdm(f_train_loader):
+        optimizer.zero_grad()
+        output = model(input.to(device))
+        loss = criterion(output, target.to(device))
+        loss.backward()
+        optimizer.step()
+accuracies['mnist_no_EWC'] = get_accuracy(model, test_loader)
+accuracies['f_mnist_no_EWC'] = get_accuracy(model, f_test_loader)
+print(accuracies)
+print("--"*20)
+
 for epoch in range(EPOCHS):
     for input, target in tqdm(f_train_loader):
         output = model(input.to(device))
@@ -147,4 +161,4 @@ for epoch in range(EPOCHS):
 
 accuracies['mnist_EWC'] = get_accuracy(model, test_loader)
 accuracies['f_mnist_EWC'] = get_accuracy(model, f_test_loader)
-print(accuracies)
+print(accuracies['mnist_EWC'], accuracies['f_mnist_EWC'])
